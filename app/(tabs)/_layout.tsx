@@ -11,7 +11,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
           title: "Home",
           tabBarLabel: () => null,
@@ -48,7 +48,6 @@ export default function TabsLayout() {
         }}
         options={{
           title: "Add",
-          // presentation: "modal",
           tabBarLabel: () => null,
           tabBarIcon: ({ focused }) => (
             <Ionicons
@@ -85,6 +84,13 @@ export default function TabsLayout() {
               size={24}
             />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="following"
+        options={{
+          title: "Following",
+          href: null,
         }}
       />
     </Tabs>
