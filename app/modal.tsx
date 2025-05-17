@@ -1,3 +1,5 @@
+import { HashtagDropdown } from "@/components/HashtagDropdown";
+import { useHashTagInput } from "@/hooks/useHashTagInput";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -56,7 +58,16 @@ export default function Modal() {
   const [replyOption, setReplyOption] = useState("Anyone");
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
-
+  const {
+    inputValue: hashtagInputValue,
+    isDropdownVisible: hashtagDropdownVisible,
+    suggestions,
+    handleInputChange,
+    handleSelect,
+    setIsDropdownVisible: setHashtagDropdownVisible,
+  } = useHashTagInput((hashtag) => {
+    updateThreadHashtag(threads[0].id, hashtag);
+  });
   const replyOptions = ["Anyone", "Profiles you follow", "Mentioned only"];
 
   const handleCancel = () => {
@@ -70,6 +81,14 @@ export default function Modal() {
     setThreads((prevThreads) =>
       prevThreads.map((thread) =>
         thread.id === id ? { ...thread, text } : thread
+      )
+    );
+  };
+
+  const updateThreadHashtag = (id: string, hashtag: string) => {
+    setThreads((prevThreads) =>
+      prevThreads.map((thread) =>
+        thread.id === id ? { ...thread, hashtag } : thread
       )
     );
   };
@@ -112,7 +131,32 @@ export default function Modal() {
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.userInfoContainer}>
-          <Text style={styles.username}>seyoungcho</Text>
+          <View style={styles.topicContainer}>
+            <Text style={styles.username}>seyoungcho</Text>
+            {index === 0 && (
+              <>
+                <Ionicons name="chevron-forward" size={16} color="#8e8e93" />
+                <View style={{ position: "relative" }}>
+                  <TextInput
+                    style={[
+                      item.hashtag ? styles.hashtag : styles.hashTagPlaceholder,
+                    ]}
+                    value={hashtagInputValue}
+                    placeholder="Add a topic"
+                    placeholderTextColor="#8e8e93"
+                    onFocus={() => setHashtagDropdownVisible(true)}
+                    onBlur={() => setHashtagDropdownVisible(false)}
+                    onChangeText={handleInputChange}
+                  />
+                  <HashtagDropdown
+                    suggestions={suggestions}
+                    onSelect={handleSelect}
+                    visible={hashtagDropdownVisible}
+                  />
+                </View>
+              </>
+            )}
+          </View>
           {index > 0 && (
             <TouchableOpacity
               onPress={() => removeThread(item.id)}
@@ -437,5 +481,21 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 14,
     color: "#8e8e93",
+  },
+  topicContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  hashtag: {
+    alignSelf: "flex-end",
+    color: "#000",
+    fontSize: 15,
+    fontWeight: 500,
+  },
+  hashTagPlaceholder: {
+    color: "#8e8e93",
+    fontSize: 15,
+    fontWeight: 500,
   },
 });
