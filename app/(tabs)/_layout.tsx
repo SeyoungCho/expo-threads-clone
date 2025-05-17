@@ -5,7 +5,7 @@ import { Modal, Text, TouchableOpacity, View } from "react-native";
 
 export default function TabsLayout() {
   const router = useRouter();
-  const isLoggedIn = false;
+  const isLoggedIn = true;
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const openLoginModal = () => {
@@ -121,13 +121,6 @@ export default function TabsLayout() {
                 size={24}
               />
             ),
-          }}
-        />
-        <Tabs.Screen
-          name="following"
-          options={{
-            title: "Following",
-            href: null,
           }}
         />
         <Tabs.Screen
