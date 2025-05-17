@@ -19,6 +19,7 @@ export default function TabsLayout() {
   return (
     <>
       <Tabs
+        backBehavior="history"
         screenOptions={{
           headerShown: false,
         }}
@@ -39,6 +40,12 @@ export default function TabsLayout() {
         />
         <Tabs.Screen
           name="search"
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              router.navigate("/search");
+            },
+          }}
           options={{
             title: "Search",
             tabBarLabel: () => null,
