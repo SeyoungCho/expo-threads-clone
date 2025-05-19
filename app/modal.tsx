@@ -1,11 +1,14 @@
 import { HashtagDropdown } from "@/components/HashtagDropdown";
 import { useHashTagInput } from "@/hooks/useHashTagInput";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
+  Linking,
   Pressable,
   StyleSheet,
   Text,
@@ -19,7 +22,7 @@ interface Thread {
   id: string;
   text: string;
   hashtag?: string;
-  location?: [number, number];
+  location?: string;
   imageUris: string[];
 }
 
@@ -112,7 +115,43 @@ export default function Modal() {
 
   const removeImageFromThread = (id: string, uriToRemove: string) => {};
 
-  const getMyLocation = async (id: string) => {};
+  const getMyLocation = async (id: string) => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Location permission not granted",
+        "Please grant location permission in settings",
+        [
+          {
+            text: "Open settings",
+            onPress: () => Linking.openSettings(),
+          },
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+        ]
+      );
+
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    const [address] = await Location.reverseGeocodeAsync({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+
+    setThreads((prevThreads) =>
+      prevThreads.map((thread) =>
+        thread.id === id
+          ? {
+              ...thread,
+              location: `${address.district}, ${address.street}`,
+            }
+          : thread
+      )
+    );
+  };
 
   const renderThreadItem = ({
     item,
@@ -205,9 +244,7 @@ export default function Modal() {
         )}
         {item.location && (
           <View style={styles.locationContainer}>
-            <Text style={styles.locationText}>
-              {item.location[0]}, {item.location[1]}
-            </Text>
+            <Text style={styles.locationText}>{item.location}</Text>
           </View>
         )}
         <View style={styles.actionButtons}>
